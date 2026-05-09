@@ -1,0 +1,53 @@
+/* ============================================
+   SERVICIOS — Estilos específicos
+   ============================================ */
+
+.servicios-page {
+  background-color: var(--color-cream);
+  padding-bottom: 0;
+}
+
+.servicios-page .page-header {
+  padding: 50px 0 32px;
+}
+
+/* ---------- Banner ---------- */
+.servicios-banner {
+  background-color:#FAF8F5;
+  padding: 0;
+}
+
+.servicios-banner-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.servicios-img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+/* ---------- CTA inferior ---------- */
+.servicios-cta {
+  background-color: var(--color-cream);
+  padding: 48px 0 56px;
+}
+
+.servicios-cta-text {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--color-stone);
+  margin-bottom: 20px;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 575.98px) {
+  .servicios-page .page-header {
+    padding: 32px 0 20px;
+  }
+
+  .servicios-cta {
+    padding: 36px 0 44px;
+  }
+}
