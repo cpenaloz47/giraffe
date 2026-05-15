@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { useForm } from '../hooks/useForm';
 import { useToast } from '../context/ToastContext';
+import { sendContactMessage } from '../services/api';
 import PageHeader from '../components/ui/PageHeader';
 import InfoBlock from '../components/ui/InfoBlock';
 import { ciudades, motivosContacto, contactInfo } from '../data/mock';
@@ -27,11 +28,25 @@ export default function ContactoPage() {
   const { values, errors, handleChange, handleSubmit } = useForm(initialValues, validate);
   const { showToast } = useToast();
   const [success, setSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const onSubmit = useCallback((data) => {
-    console.log('📧 Datos del formulario (mock):', data);
-    setSuccess(true);
-    showToast('Mensaje enviado correctamente');
+  const onSubmit = useCallback(async (data) => {
+    try {
+      setLoading(true);
+      await sendContactMessage(
+        data.nombre,
+        data.email,
+        data.telefono,
+        data.motivo,
+        `${data.detalle}\n\nCiudad: ${data.ciudad}\nPreferencia de contacto: ${data.preferencia}`
+      );
+      setSuccess(true);
+      showToast('Mensaje enviado correctamente');
+    } catch (err) {
+      showToast(err.message || 'Error al enviar el mensaje', 'error');
+    } finally {
+      setLoading(false);
+    }
   }, [showToast]);
 
   if (success) {
@@ -180,7 +195,16 @@ export default function ContactoPage() {
           </div>
 
           <div className="submit-wrapper">
-            <button type="submit" className="btn btn-enviar">ENVIAR CONSULTA</button>
+            <button type="submit" className="btn btn-enviar" disabled={loading}>
+              {loading ? (
+                <>
+                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                  ENVIANDO...
+                </>
+              ) : (
+                'ENVIAR CONSULTA'
+              )}
+            </button>
           </div>
         </form>
 

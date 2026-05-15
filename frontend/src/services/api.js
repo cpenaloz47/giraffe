@@ -1,4 +1,8 @@
-const API_BASE = '/api/v1';
+// URL base del API según entorno
+const isDevelopment = import.meta.env.DEV;
+const API_BASE = isDevelopment 
+  ? 'http://127.0.0.1:4000/api/v1'  // Backend en desarrollo
+  : '/api/v1';  // Backend en producción (proxy)
 
 export async function apiRequest(endpoint, options = {}) {
   const token = localStorage.getItem('giraffe_token');
@@ -14,4 +18,67 @@ export async function apiRequest(endpoint, options = {}) {
 
   if (res.status === 204) return null;
   return res.json();
+}
+
+// ============================================
+// AUTENTICACIÓN
+// ============================================
+
+export async function registerUser(nombre, email, password, telefono) {
+  // No enviar telefono si está vacío
+  const body = { nombre, email, password };
+  if (telefono && telefono.trim()) {
+    body.telefono = telefono;
+  }
+  
+  return apiRequest('/auth/register', {
+    method: 'POST',
+    body: JSON.stringify(body),
+  });
+}
+
+export async function loginUser(email, password) {
+  return apiRequest('/auth/login', {
+    method: 'POST',
+    body: JSON.stringify({ email, password }),
+  });
+}
+
+export async function refreshToken(token) {
+  return apiRequest('/auth/refresh', {
+    method: 'POST',
+    body: JSON.stringify({ token }),
+  });
+}
+
+// ============================================
+// CONTACTO
+// ============================================
+
+export async function sendContactMessage(nombre, email, telefono, motivo, mensaje) {
+  return apiRequest('/contact', {
+    method: 'POST',
+    body: JSON.stringify({ nombre, email, telefono, motivo, mensaje }),
+  });
+}
+
+export async function getContactMessages() {
+  return apiRequest('/contact', { method: 'GET' });
+}
+
+// ============================================
+// CATÁLOGO
+// ============================================
+
+export async function getBrands() {
+  return apiRequest('/brands', { method: 'GET' });
+}
+
+export async function getCars(filters = {}) {
+  const query = new URLSearchParams(filters).toString();
+  return apiRequest(`/cars${query ? `?${query}` : ''}`, { method: 'GET' });
+}
+
+export async function getCarById(id) {
+  return apiRequest(`/cars/${id}`, { method: 'GET' });
 }

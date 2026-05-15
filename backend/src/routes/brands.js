@@ -8,7 +8,7 @@ const router = Router();
 router.get('/', async (req, res) => {
   try {
     const result = await pool.query(
-      'SELECT id, nombre, logo_url AS "logoUrl", pais, created_at AS "createdAt" FROM marcas ORDER BY nombre'
+      'SELECT id, nombre, logo_url AS "logoUrl", created_at AS "createdAt" FROM marcas ORDER BY nombre'
     );
     res.json({ data: result.rows });
   } catch (err) {
@@ -20,7 +20,7 @@ router.get('/', async (req, res) => {
 router.get('/:id', async (req, res) => {
   try {
     const result = await pool.query(
-      'SELECT id, nombre, logo_url AS "logoUrl", pais, created_at AS "createdAt" FROM marcas WHERE id = $1',
+      'SELECT id, nombre, logo_url AS "logoUrl", created_at AS "createdAt" FROM marcas WHERE id = $1',
       [req.params.id]
     );
     if (result.rows.length === 0) {
@@ -35,14 +35,14 @@ router.get('/:id', async (req, res) => {
 // POST /brands — Admin
 router.post('/', authenticate, authorizeAdmin, async (req, res) => {
   try {
-    const { nombre, logoUrl, pais } = req.body;
+    const { nombre, logoUrl } = req.body;
     if (!nombre) {
       return res.status(400).json({ statusCode: 400, error: 'Bad Request', message: 'Nombre es requerido' });
     }
     const result = await pool.query(
-      `INSERT INTO marcas (nombre, logo_url, pais) VALUES ($1, $2, $3)
-       RETURNING id, nombre, logo_url AS "logoUrl", pais, created_at AS "createdAt"`,
-      [nombre, logoUrl || null, pais || null]
+      `INSERT INTO marcas (nombre, logo_url) VALUES ($1, $2)
+       RETURNING id, nombre, logo_url AS "logoUrl", created_at AS "createdAt"`,
+      [nombre, logoUrl || null]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -56,15 +56,14 @@ router.post('/', authenticate, authorizeAdmin, async (req, res) => {
 // PUT /brands/:id — Admin
 router.put('/:id', authenticate, authorizeAdmin, async (req, res) => {
   try {
-    const { nombre, logoUrl, pais } = req.body;
+    const { nombre, logoUrl } = req.body;
     const result = await pool.query(
       `UPDATE marcas SET
         nombre = COALESCE($1, nombre),
-        logo_url = COALESCE($2, logo_url),
-        pais = COALESCE($3, pais)
-       WHERE id = $4
-       RETURNING id, nombre, logo_url AS "logoUrl", pais, created_at AS "createdAt"`,
-      [nombre, logoUrl, pais, req.params.id]
+        logo_url = COALESCE($2, logo_url)
+       WHERE id = $3
+       RETURNING id, nombre, logo_url AS "logoUrl", created_at AS "createdAt"`,
+      [nombre, logoUrl, req.params.id]
     );
     if (result.rows.length === 0) {
       return res.status(404).json({ statusCode: 404, error: 'Not Found', message: 'Marca no encontrada' });

@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { apiRequest } from '../services/api';
+import { loginUser, registerUser } from '../services/api';
 
 const AuthContext = createContext(null);
 
@@ -7,6 +7,7 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Restaurar sesión desde localStorage al montar
   useEffect(() => {
@@ -20,36 +21,60 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = async (email, password) => {
-    const data = await apiRequest('/auth/login', {
-      method: 'POST',
-      body: JSON.stringify({ email, password }),
-    });
-    setToken(data.token);
-    setUser({ id: data.id, nombre: data.nombre, email: data.email, rol: data.rol });
-    localStorage.setItem('giraffe_token', data.token);
-    localStorage.setItem('giraffe_user', JSON.stringify({
-      id: data.id, nombre: data.nombre, email: data.email, rol: data.rol,
-    }));
-    return data;
+    try {
+      setError(null);
+      const data = await loginUser(email, password);
+      
+      const userData = {
+        id: data.id,
+        nombre: data.nombre,
+        email: data.email,
+        rol: data.rol || 'USER',
+      };
+      
+      setToken(data.token);
+      setUser(userData);
+      localStorage.setItem('giraffe_token', data.token);
+      localStorage.setItem('giraffe_user', JSON.stringify(userData));
+      
+      return data;
+    } catch (err) {
+      const errorMsg = err.message || 'Error al iniciar sesión';
+      setError(errorMsg);
+      throw err;
+    }
   };
 
   const register = async (nombre, email, password, telefono) => {
-    const data = await apiRequest('/auth/register', {
-      method: 'POST',
-      body: JSON.stringify({ nombre, email, password, telefono }),
-    });
-    setToken(data.token);
-    setUser({ id: data.id, nombre: data.nombre, email: data.email, rol: data.rol });
-    localStorage.setItem('giraffe_token', data.token);
-    localStorage.setItem('giraffe_user', JSON.stringify({
-      id: data.id, nombre: data.nombre, email: data.email, rol: data.rol,
-    }));
-    return data;
+    try {
+      setError(null);
+      // No enviar telefono si está vacío
+      const data = await registerUser(nombre, email, password, telefono && telefono.trim() ? telefono : undefined);
+      
+      const userData = {
+        id: data.id,
+        nombre: data.nombre,
+        email: data.email,
+        rol: data.rol || 'USER',
+      };
+      
+      setToken(data.token);
+      setUser(userData);
+      localStorage.setItem('giraffe_token', data.token);
+      localStorage.setItem('giraffe_user', JSON.stringify(userData));
+      
+      return data;
+    } catch (err) {
+      const errorMsg = err.message || 'Error al registrar usuario';
+      setError(errorMsg);
+      throw err;
+    }
   };
 
   const logout = () => {
     setToken(null);
     setUser(null);
+    setError(null);
     localStorage.removeItem('giraffe_token');
     localStorage.removeItem('giraffe_user');
   };
@@ -59,9 +84,15 @@ export function AuthProvider({ children }) {
 
   return (
     <AuthContext.Provider value={{
-      user, token, loading,
-      isAuthenticated, isAdmin,
-      login, register, logout,
+      user,
+      token,
+      loading,
+      error,
+      isAuthenticated,
+      isAdmin,
+      login,
+      register,
+      logout,
     }}>
       {children}
     </AuthContext.Provider>

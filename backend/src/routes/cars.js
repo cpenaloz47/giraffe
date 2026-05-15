@@ -9,11 +9,11 @@ router.get('/', async (req, res) => {
   try {
     const {
       page = 1, limit = 12,
-      brandId, categoryId,
+      marca, modelo, tipo, transmision, combustible,
       minPrice, maxPrice,
       minYear, maxYear,
-      color, status, featured,
-      search, sortBy = 'created_at', sortOrder = 'desc',
+      estado,
+      sortBy = 'created_at', sortOrder = 'desc',
     } = req.query;
 
     const offset = (page - 1) * limit;
@@ -21,42 +21,33 @@ router.get('/', async (req, res) => {
     const params = [];
     let paramIdx = 1;
 
-    if (brandId)    { conditions.push(`a.marca_id = $${paramIdx++}`);     params.push(brandId); }
-    if (categoryId) { conditions.push(`a.categoria_id = $${paramIdx++}`); params.push(categoryId); }
-    if (minPrice)   { conditions.push(`a.precio >= $${paramIdx++}`);      params.push(minPrice); }
-    if (maxPrice)   { conditions.push(`a.precio <= $${paramIdx++}`);      params.push(maxPrice); }
-    if (minYear)    { conditions.push(`a.anio >= $${paramIdx++}`);        params.push(minYear); }
-    if (maxYear)    { conditions.push(`a.anio <= $${paramIdx++}`);        params.push(maxYear); }
-    if (color)      { conditions.push(`a.color ILIKE $${paramIdx++}`);    params.push(`%${color}%`); }
-    if (status)     { conditions.push(`a.estado = $${paramIdx++}`);       params.push(status); }
-    if (featured)   { conditions.push(`a.destacado = $${paramIdx++}`);    params.push(featured === 'true'); }
-    if (search)     { conditions.push(`a.modelo ILIKE $${paramIdx++}`);   params.push(`%${search}%`); }
+    if (marca) { conditions.push(`a.marca ILIKE $${paramIdx++}`); params.push(marca); }
+    if (modelo) { conditions.push(`a.modelo ILIKE $${paramIdx++}`); params.push(modelo); }
+    if (tipo) { conditions.push(`a.tipo_carroceria ILIKE $${paramIdx++}`); params.push(tipo); }
+    if (transmision) { conditions.push(`a.transmision ILIKE $${paramIdx++}`); params.push(transmision); }
+    if (combustible) { conditions.push(`a.combustible ILIKE $${paramIdx++}`); params.push(combustible); }
+    if (minPrice) { conditions.push(`a.precio >= $${paramIdx++}`); params.push(minPrice); }
+    if (maxPrice) { conditions.push(`a.precio <= $${paramIdx++}`); params.push(maxPrice); }
+    if (minYear) { conditions.push(`a."a¤o" >= $${paramIdx++}`); params.push(minYear); }
+    if (maxYear) { conditions.push(`a."a¤o" <= $${paramIdx++}`); params.push(maxYear); }
+    if (estado) { conditions.push(`a.estado = $${paramIdx++}`); params.push(estado); }
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
-
-    const allowedSort = ['precio', 'anio', 'created_at', 'modelo'];
-    const sortField = allowedSort.includes(sortBy) ? `a.${sortBy}` : 'a.created_at';
+    const allowedSort = ['precio', 'año', 'created_at', 'modelo'];
+    const sortField = allowedSort.includes(sortBy) ? (sortBy === 'año' ? 'a."a¤o"' : `a.${sortBy}`) : 'a.created_at';
     const order = sortOrder === 'asc' ? 'ASC' : 'DESC';
 
-    // Count total
     const countResult = await pool.query(`SELECT COUNT(*) FROM autos a ${whereClause}`, params);
-    const total = parseInt(countResult.rows[0].count);
+    const total = parseInt(countResult.rows[0].count, 10);
 
-    // Fetch data
     const dataQuery = `
       SELECT
-        a.id, a.modelo, a.anio, a.precio, a.color, a.estado, a.destacado,
-        json_build_object('id', m.id, 'nombre', m.nombre) AS marca,
-        json_build_object('id', c.id, 'nombre', c.nombre) AS categoria,
-        (SELECT url FROM imagenes WHERE auto_id = a.id AND es_portada = true LIMIT 1) AS "imagenPortada",
-        COALESCE(AVG(r.calificacion), 0) AS "promedioResenas",
-        COUNT(r.id) AS "totalResenas"
+        a.id, a.marca, a.modelo, a."a¤o" AS "anio", a.precio, a.estado, a.tipo_carroceria AS "tipoCarroceria",
+        a.transmision, a.combustible, a.kilometraje, a.descripcion,
+        a.imagen_url AS "imagenPortada",
+        a.galeria
       FROM autos a
-      JOIN marcas m ON a.marca_id = m.id
-      JOIN categorias c ON a.categoria_id = c.id
-      LEFT JOIN resenas r ON r.auto_id = a.id
       ${whereClause}
-      GROUP BY a.id, m.id, c.id
       ORDER BY ${sortField} ${order}
       LIMIT $${paramIdx++} OFFSET $${paramIdx++}
     `;
@@ -67,8 +58,8 @@ router.get('/', async (req, res) => {
     res.json({
       data: result.rows,
       meta: {
-        page: parseInt(page),
-        limit: parseInt(limit),
+        page: parseInt(page, 10),
+        limit: parseInt(limit, 10),
         total,
         totalPages: Math.ceil(total / limit),
       },
@@ -84,13 +75,11 @@ router.get('/:id', async (req, res) => {
   try {
     const autoResult = await pool.query(
       `SELECT
-        a.*,
-        json_build_object('id', m.id, 'nombre', m.nombre, 'logoUrl', m.logo_url, 'pais', m.pais) AS marca,
-        json_build_object('id', c.id, 'nombre', c.nombre) AS categoria
-       FROM autos a
-       JOIN marcas m ON a.marca_id = m.id
-       JOIN categorias c ON a.categoria_id = c.id
-       WHERE a.id = $1`,
+        id, marca, modelo, "a¤o" AS "anio", precio, estado, tipo_carroceria AS "tipoCarroceria",
+        transmision, combustible, kilometraje, descripcion, imagen_url AS "imagenPortada",
+        galeria
+       FROM autos
+       WHERE id = $1`,
       [req.params.id]
     );
 
@@ -100,25 +89,9 @@ router.get('/:id', async (req, res) => {
 
     const auto = autoResult.rows[0];
 
-    // Imágenes
-    const imgResult = await pool.query(
-      'SELECT id, url, orden, es_portada AS "esPortada" FROM imagenes WHERE auto_id = $1 ORDER BY orden',
-      [req.params.id]
-    );
-
-    // Resumen reseñas
-    const revResult = await pool.query(
-      'SELECT COALESCE(AVG(calificacion), 0) AS promedio, COUNT(*) AS total FROM resenas WHERE auto_id = $1',
-      [req.params.id]
-    );
-
     res.json({
       ...auto,
-      imagenes: imgResult.rows,
-      resenas: {
-        promedio: parseFloat(revResult.rows[0].promedio),
-        total: parseInt(revResult.rows[0].total),
-      },
+      imagenes: auto.galeria || [],
     });
   } catch (err) {
     res.status(500).json({ statusCode: 500, error: 'Internal Server Error', message: err.message });
@@ -130,7 +103,7 @@ router.post('/', authenticate, authorizeAdmin, async (req, res) => {
   try {
     const {
       marcaId, categoriaId, modelo, anio, precio,
-      color, motor, caballosFuerza, transmision,
+      motor, caballosFuerza, transmision,
       kilometraje, descripcion, estado, destacado,
     } = req.body;
 
@@ -143,10 +116,10 @@ router.post('/', authenticate, authorizeAdmin, async (req, res) => {
     }
 
     const result = await pool.query(
-      `INSERT INTO autos (marca_id, categoria_id, modelo, anio, precio, color, motor, caballos_fuerza, transmision, kilometraje, descripcion, estado, destacado)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
+      `INSERT INTO autos (marca_id, categoria_id, modelo, "a¤o", precio, motor, caballos_fuerza, transmision, kilometraje, descripcion, estado, destacado)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
        RETURNING *`,
-      [marcaId, categoriaId, modelo, anio, precio, color, motor, caballosFuerza, transmision, kilometraje || 0, descripcion, estado || 'AVAILABLE', destacado || false]
+      [marcaId, categoriaId, modelo, anio, precio, motor, caballosFuerza, transmision, kilometraje || 0, descripcion, estado || 'AVAILABLE', destacado || false]
     );
 
     res.status(201).json(result.rows[0]);
@@ -165,7 +138,7 @@ router.put('/:id', authenticate, authorizeAdmin, async (req, res) => {
 
     const fieldMap = {
       marcaId: 'marca_id', categoriaId: 'categoria_id', modelo: 'modelo',
-      anio: 'anio', precio: 'precio', color: 'color', motor: 'motor',
+      anio: '"a¤o"', precio: 'precio', motor: 'motor',
       caballosFuerza: 'caballos_fuerza', transmision: 'transmision',
       kilometraje: 'kilometraje', descripcion: 'descripcion',
       estado: 'estado', destacado: 'destacado',

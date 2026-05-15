@@ -1,23 +1,31 @@
 const { Router } = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { body, validationResult } = require('express-validator');
 const pool = require('../db/pool');
 const { authenticate } = require('../middleware/auth');
 
 const router = Router();
 
 // POST /auth/register
-router.post('/register', async (req, res) => {
+router.post('/register', [
+  body('nombre').isLength({ min: 2 }).withMessage('Nombre debe tener al menos 2 caracteres'),
+  body('email').isEmail().withMessage('Email inválido'),
+  body('password').isLength({ min: 6 }).withMessage('Password debe tener al menos 6 caracteres'),
+  body('telefono').optional().isMobilePhone().withMessage('Teléfono inválido'),
+], async (req, res) => {
   try {
-    const { nombre, email, password, telefono } = req.body;
-
-    if (!nombre || !email || !password) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
       return res.status(400).json({
         statusCode: 400,
         error: 'Bad Request',
-        message: 'Nombre, email y password son requeridos',
+        message: 'Datos inválidos',
+        errors: errors.array(),
       });
     }
+
+    const { nombre, email, password, telefono } = req.body;
 
     // Verificar si el email ya existe
     const exists = await pool.query('SELECT id FROM usuarios WHERE email = $1', [email]);
@@ -60,17 +68,22 @@ router.post('/register', async (req, res) => {
 });
 
 // POST /auth/login
-router.post('/login', async (req, res) => {
+router.post('/login', [
+  body('email').isEmail().withMessage('Email inválido'),
+  body('password').notEmpty().withMessage('Password requerido'),
+], async (req, res) => {
   try {
-    const { email, password } = req.body;
-
-    if (!email || !password) {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
       return res.status(400).json({
         statusCode: 400,
         error: 'Bad Request',
-        message: 'Email y password son requeridos',
+        message: 'Datos inválidos',
+        errors: errors.array(),
       });
     }
+
+    const { email, password } = req.body;
 
     const result = await pool.query(
       'SELECT id, nombre, email, password_hash, rol, activo FROM usuarios WHERE email = $1',
