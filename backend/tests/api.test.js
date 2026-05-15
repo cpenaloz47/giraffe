@@ -2,22 +2,33 @@ const request = require('supertest');
 const app = require('../src/index');
 const pool = require('../src/db/pool');
 
-describe('API Tests', () => {
+const randomId = Date.now();
+const testUsers = {
+  register: 'test+register.' + randomId + '@example.com',
+  existing: 'test+existing.' + randomId + '@example.com',
+  login: 'test+login.' + randomId + '@example.com',
+};
+
+let firstBrandId;
+let firstCarId;
+
+describe('Giraffe Motors Backend API', () => {
   beforeAll(async () => {
-    // Limpiar tablas de prueba si es necesario
+    await pool.query('DELETE FROM contactos WHERE email LIKE $1', ['test+%@example.com']);
+    await pool.query('DELETE FROM usuarios WHERE email LIKE $1', ['test+%@example.com']);
   });
 
   afterAll(async () => {
     await pool.end();
   });
 
-  describe('POST /api/v1/auth/register', () => {
-    it('should register a new user successfully', async () => {
+  describe('Rutas de autenticación', () => {
+    it('registra un usuario nuevo correctamente', async () => {
       const response = await request(app)
         .post('/api/v1/auth/register')
         .send({
           nombre: 'Test User',
-          email: 'test@example.com',
+          email: testUsers.register,
           password: 'password123',
           telefono: '+56987654321',
         });
@@ -25,9 +36,10 @@ describe('API Tests', () => {
       expect(response.status).toBe(201);
       expect(response.body).toHaveProperty('id');
       expect(response.body).toHaveProperty('token');
+      expect(response.body.email).toBe(testUsers.register);
     });
 
-    it('should return 400 for invalid data', async () => {
+    it('retorna 400 para datos inválidos de registro', async () => {
       const response = await request(app)
         .post('/api/v1/auth/register')
         .send({
@@ -40,65 +52,59 @@ describe('API Tests', () => {
       expect(response.body).toHaveProperty('errors');
     });
 
-    it('should return 409 for existing email', async () => {
-      // Primero registrar un usuario
+    it('retorna 409 cuando el email ya existe', async () => {
       await request(app)
         .post('/api/v1/auth/register')
         .send({
           nombre: 'Existing User',
-          email: 'existing@example.com',
+          email: testUsers.existing,
           password: 'password123',
         });
 
-      // Intentar registrar de nuevo
       const response = await request(app)
         .post('/api/v1/auth/register')
         .send({
           nombre: 'Another User',
-          email: 'existing@example.com',
+          email: testUsers.existing,
           password: 'password123',
         });
 
       expect(response.status).toBe(409);
     });
-  });
 
-  describe('POST /api/v1/auth/login', () => {
-    beforeAll(async () => {
-      // Registrar un usuario para login
+    it('inicia sesión correctamente con credenciales válidas', async () => {
       await request(app)
         .post('/api/v1/auth/register')
         .send({
           nombre: 'Login User',
-          email: 'login@example.com',
+          email: testUsers.login,
           password: 'password123',
         });
-    });
 
-    it('should login successfully', async () => {
       const response = await request(app)
         .post('/api/v1/auth/login')
         .send({
-          email: 'login@example.com',
+          email: testUsers.login,
           password: 'password123',
         });
 
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('token');
+      expect(response.body.email).toBe(testUsers.login);
     });
 
-    it('should return 401 for invalid credentials', async () => {
+    it('retorna 401 para credenciales de login inválidas', async () => {
       const response = await request(app)
         .post('/api/v1/auth/login')
         .send({
-          email: 'login@example.com',
+          email: testUsers.login,
           password: 'wrongpassword',
         });
 
       expect(response.status).toBe(401);
     });
 
-    it('should return 400 for invalid data', async () => {
+    it('retorna 400 para datos de login inválidos', async () => {
       const response = await request(app)
         .post('/api/v1/auth/login')
         .send({
@@ -110,13 +116,13 @@ describe('API Tests', () => {
     });
   });
 
-  describe('POST /api/v1/contact', () => {
-    it('should send contact message successfully', async () => {
+  describe('Rutas de contacto', () => {
+    it('envía un mensaje de contacto correctamente', async () => {
       const response = await request(app)
         .post('/api/v1/contact')
         .send({
           nombre: 'Contact User',
-          email: 'contact@example.com',
+          email: 'test+contact.' + randomId + '@example.com',
           telefono: '+56987654321',
           motivo: 'compra',
           mensaje: 'Estoy interesado en comprar un auto.',
@@ -124,9 +130,10 @@ describe('API Tests', () => {
 
       expect(response.status).toBe(201);
       expect(response.body).toHaveProperty('data');
+      expect(response.body.data.email).toContain('test+contact.');
     });
 
-    it('should return 400 for invalid data', async () => {
+    it('retorna 400 para datos de contacto inválidos', async () => {
       const response = await request(app)
         .post('/api/v1/contact')
         .send({
@@ -141,13 +148,52 @@ describe('API Tests', () => {
     });
   });
 
-  describe('GET /api/v1/health', () => {
-    it('should return health status', async () => {
-      const response = await request(app)
-        .get('/api/v1/health');
-
+  describe('Endpoints públicos', () => {
+    it('retorna el estado de salud', async () => {
+      const response = await request(app).get('/api/v1/health');
       expect(response.status).toBe(200);
       expect(response.body).toHaveProperty('status', 'ok');
+    });
+
+    it('retorna la lista de marcas', async () => {
+      const response = await request(app).get('/api/v1/brands');
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body.data)).toBe(true);
+      if (response.body.data.length > 0) {
+        firstBrandId = response.body.data[0].id;
+      }
+    });
+
+    it('retorna la lista de autos con metadatos', async () => {
+      const response = await request(app).get('/api/v1/cars');
+      expect(response.status).toBe(200);
+      expect(Array.isArray(response.body.data)).toBe(true);
+      expect(response.body).toHaveProperty('meta');
+      if (response.body.data.length > 0) {
+        firstCarId = response.body.data[0].id;
+      }
+    });
+
+    it('retorna detalles de un auto existente', async () => {
+      if (!firstCarId) {
+        return;
+      }
+
+      const response = await request(app).get(`/api/v1/cars/${firstCarId}`);
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('id', firstCarId);
+      expect(response.body).toHaveProperty('marca');
+    });
+
+    it('retorna detalles de una marca existente', async () => {
+      if (!firstBrandId) {
+        return;
+      }
+
+      const response = await request(app).get(`/api/v1/brands/${firstBrandId}`);
+      expect(response.status).toBe(200);
+      expect(response.body).toHaveProperty('id', firstBrandId);
+      expect(response.body).toHaveProperty('nombre');
     });
   });
 });

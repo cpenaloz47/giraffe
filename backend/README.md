@@ -1,136 +1,132 @@
 # 🦒 Giraffe Motors — Backend API
 
-API REST para el sistema de e-commerce de autos de lujo Giraffe Motors.
+API REST para el e-commerce de autos de lujo Giraffe Motors.
 
 ## 🚀 Características
 
-- **Autenticación JWT**: Registro, login y refresh tokens
-- **Base de datos PostgreSQL**: Gestión de usuarios, contactos y catálogo
-- **Validación de datos**: Middlewares con express-validator
-- **CORS**: Soporte para orígenes cruzados
-- **Tests**: Cobertura de rutas API con Jest y Supertest
-- **Documentación**: Endpoints RESTful
+- **Autenticación JWT**: Registro, login y refresh de tokens
+- **Base de datos PostgreSQL**: Usuarios, contactos, marcas y autos
+- **Validación de datos**: express-validator en rutas clave
+- **CORS**: Soporte para frontend Vite
+- **Tests**: Jest + Supertest
+- **Documentación**: Endpoints RESTful en /api/v1
 
 ## 📋 Requisitos
 
 - Node.js 18+
 - PostgreSQL 12+
-- npm o yarn
+- npm
 
-## � Inicio rápido
+## 🧰 Configuración rápida
 
-1. **Configurar variables de entorno**
+1. Copia el archivo de entorno:
    ```bash
    cp .env.example .env
-   # Edita .env con tus credenciales de PostgreSQL
    ```
-
-2. **Instalar dependencias**
+2. Ajusta las variables de conexión en .env.
+3. Instala dependencias:
    ```bash
    npm install
    ```
-
-3. **Crear base de datos**
-   - Asegúrate de tener PostgreSQL instalado y ejecutándose
-   - Ejecuta el script de configuración: `setup-db.bat` (como administrador)
-   - O configura manualmente:
-     ```bash
-     # Establecer contraseña para usuario postgres
-     psql -U postgres -c "ALTER USER postgres WITH PASSWORD 'dino13';"
-
-     # Crear base de datos
-     createdb -U postgres giraffe_db
-
-     # Ejecutar esquema
-     psql -U postgres -d giraffe_db -f database.sql
-     ```
-
-4. **Ejecutar servidor**
+4. Crea la base de datos y carga el esquema:
    ```bash
-   npm run dev  # Puerto por defecto: 8080 (o 5000 si está ocupado)
+   createdb giraffe_db
+   psql -d giraffe_db -f database.sql
    ```
 
-   El servidor iniciará automáticamente en un puerto disponible (8080, 5000, 4000, etc.)
+   En Windows puedes usar setup-db.bat.
 
-## 🔍 Verificar Conexión
+   Para ejecutar pruebas unitarias en el entorno de test:
+   ```bash
+   NODE_ENV=test npm test
+   ```
 
-**Health Check General:**
+   En Windows puedes usar setup-db.bat.
+
+## ▶️ Ejecutar servidor
+
+```bash
+npm run dev
+```
+
+El servidor intenta iniciar en un puerto disponible, preferente 8080, 5000 o 4000.
+
+## 🔍 Verificar salud
+
 ```bash
 curl http://127.0.0.1:4000/api/v1/health
-```
-
-**Verificar Conexión a Base de Datos:**
-```bash
 curl http://127.0.0.1:4000/api/v1/health/db
 ```
-Si la conexión es exitosa, verás información sobre PostgreSQL.
 
-## 📚 API Endpoints
+## 📚 Endpoints principales
 
 ### Autenticación
-- `POST /api/v1/auth/register` — Registrar usuario
-- `POST /api/v1/auth/login` — Iniciar sesión
-- `POST /api/v1/auth/refresh` — Refrescar token
+- POST /api/v1/auth/register
+- POST /api/v1/auth/login
+- POST /api/v1/auth/refresh
 
 ### Contacto
-- `POST /api/v1/contact` — Enviar mensaje de contacto
-- `GET /api/v1/contact` — Listar mensajes (solo admin)
+- POST /api/v1/contact
+- GET /api/v1/contact (admin)
 
-### Catálogo
-- `GET /api/v1/brands` — Listar marcas
-- `GET /api/v1/cars` — Listar autos
-- `GET /api/v1/cars/:id` — Detalles de auto
+### Marcas
+- GET /api/v1/brands
+- GET /api/v1/brands/:id
+- POST /api/v1/brands (admin)
+- PUT /api/v1/brands/:id (admin)
+- DELETE /api/v1/brands/:id (admin)
 
-### Health
-- `GET /api/v1/health` — Estado del servidor
+### Autos
+- GET /api/v1/cars
+- GET /api/v1/cars/:id
+- POST /api/v1/cars (admin)
+- PUT /api/v1/cars/:id (admin)
+- DELETE /api/v1/cars/:id (admin)
 
 ## 🧪 Tests
-
-Los tests cubren:
-- Registro de usuarios (éxito, validación, conflicto)
-- Login (éxito, credenciales inválidas, validación)
-- Contacto (envío, validación)
-- Health check
 
 ```bash
 npm test
 ```
 
-## 🔧 Scripts
+### Thunder Client
 
-- `npm run dev` — Desarrollo con nodemon
-- `npm test` — Ejecutar tests
-- `npm run start` — Producción
+- Si usas la extensión Thunder Client, crea una colección de pruebas con base URL:
+  `http://127.0.0.1:4000/api/v1`
+- Rutas sugeridas: `/auth/register`, `/auth/login`, `/contact`, `/brands`, `/cars`, `/health`
+- Para pruebas unitarias automáticas usa Jest + Supertest en `backend/tests/api.test.js`.
 
-## 📁 Estructura del proyecto
+## 🗂️ Estructura del backend
 
 ```
 backend/
 ├── src/
 │   ├── db/
-│   │   └── pool.js          # Conexión PostgreSQL
+│   │   └── pool.js
 │   ├── middleware/
-│   │   └── auth.js          # Autenticación JWT
+│   │   └── auth.js
 │   ├── routes/
-│   │   ├── auth.js          # Rutas de autenticación
-│   │   ├── contact.js       # Rutas de contacto
-│   │   ├── brands.js        # Rutas de marcas
-│   │   └── cars.js          # Rutas de autos
-│   └── index.js             # Servidor principal
+│   │   ├── auth.js
+│   │   ├── contact.js
+│   │   ├── brands.js
+│   │   └── cars.js
+│   └── index.js
 ├── tests/
-│   └── api.test.js          # Tests de API
-├── database.sql             # Esquema de BD
-├── .env.example             # Variables de entorno
-└── package.json
+│   └── api.test.js
+├── database.sql
+├── .env.example
+├── package.json
+└── setup-db.bat
 ```
 
 ## 🔒 Seguridad
 
 - Contraseñas hasheadas con bcrypt
 - Tokens JWT con expiración
-- Validación de entrada en todas las rutas
+- Rutas protegidas con middleware
 - CORS configurado para frontend
 
-## 📝 Notas
+## 💡 Notas
 
-Para ejecutar los tests completamente, asegúrate de tener PostgreSQL configurado con las credenciales correctas en `.env`.
+- database.sql incluye esquema y datos iniciales.
+- No subas credenciales en .env.
