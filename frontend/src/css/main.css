@@ -1152,6 +1152,11 @@ body {
   gap: 14px;
 }
 
+.catalogo-details-gallery-image:only-child {
+  grid-column: 1 / -1;
+  min-height: 240px;
+}
+
 .catalogo-details-gallery-image {
   width: 100%;
   min-height: 150px;
@@ -1262,5 +1267,316 @@ body {
   font-size: 0.92rem;
   color: var(--color-lightstone);
   letter-spacing: 1px;
+}
+
+/* ============================================
+   DETAIL MODAL — Action buttons
+   ============================================ */
+.catalogo-details-actions {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-top: 28px;
+  padding-top: 22px;
+  border-top: 1px solid rgba(194, 167, 110, 0.2);
+}
+
+.btn-detail-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 13px 10px;
+  border: none;
+  border-radius: 8px;
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  cursor: pointer;
+  transition: opacity 0.18s, transform 0.15s;
+  white-space: nowrap;
+}
+
+.btn-detail-action:hover {
+  opacity: 0.82;
+  transform: translateY(-1px);
+}
+
+.btn-detail-contactar:hover {
+  background: var(--color-charcoal);
+  color: var(--color-cream);
+  opacity: 1;
+}
+
+.btn-detail-action:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-detail-credito {
+  background: var(--color-charcoal);
+  color: var(--color-cream);
+}
+
+.btn-detail-contactar {
+  background: transparent;
+  color: var(--color-charcoal);
+  border: 1.5px solid var(--color-charcoal);
+}
+
+.btn-detail-negociar {
+  background: var(--color-accent);
+  color: var(--color-charcoal);
+}
+
+.btn-detail-agendar {
+  background: var(--color-warmgray);
+  color: var(--color-cream);
+}
+
+@media (max-width: 700px) {
+  .catalogo-details-actions {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 400px) {
+  .catalogo-details-actions {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ============================================
+   COMPRA PAGE / AGENDA PAGE
+   ============================================ */
+.compra-page,
+.agenda-page {
+  min-height: 70vh;
+  padding-bottom: 60px;
+}
+
+.compra-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 32px;
+  align-items: start;
+}
+
+.compra-auto-card {
+  background: #fafaf8;
+  border: 1px solid rgba(194, 167, 110, 0.25);
+  border-radius: 12px;
+  padding: 28px 24px;
+  position: sticky;
+  top: 100px;
+}
+
+.compra-auto-card h3 {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 1px;
+  color: var(--color-stone);
+  margin: 0 0 16px;
+  text-transform: uppercase;
+}
+
+.compra-auto-info { margin-bottom: 20px; }
+
+.compra-auto-nombre {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-charcoal);
+  margin: 0 0 4px;
+}
+
+.compra-auto-detalle {
+  font-size: 0.88rem;
+  color: var(--color-stone);
+  margin: 0 0 10px;
+}
+
+.compra-auto-precio {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-accent, #c2a76e);
+  margin: 0;
+}
+
+.agenda-horario-info {
+  background: rgba(194, 167, 110, 0.08);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 20px;
+  font-size: 0.85rem;
+  color: var(--color-charcoal);
+  line-height: 1.7;
+}
+
+.agenda-horario-info p { margin: 0; }
+.agenda-horario-info p:first-child { margin-bottom: 4px; }
+
+.btn-compra-volver {
+  background: none;
+  border: 1px solid rgba(194, 167, 110, 0.4);
+  border-radius: 8px;
+  padding: 9px 16px;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  color: var(--color-stone);
+  cursor: pointer;
+  width: 100%;
+  transition: border-color 0.18s, color 0.18s;
+}
+
+.btn-compra-volver:hover {
+  border-color: var(--color-accent, #c2a76e);
+  color: var(--color-accent, #c2a76e);
+}
+
+.compra-form-container {
+  background: #fff;
+  border: 1px solid rgba(194, 167, 110, 0.2);
+  border-radius: 12px;
+  padding: 36px 32px;
+}
+
+.compra-form h3 {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: var(--color-charcoal);
+  margin: 0 0 24px;
+}
+
+.compra-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+  margin-bottom: 28px;
+}
+
+.compra-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.compra-field-full { grid-column: 1 / -1; }
+
+.compra-field label {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+  color: var(--color-stone);
+  text-transform: uppercase;
+}
+
+.compra-field input,
+.compra-field textarea {
+  padding: 11px 14px;
+  border: 1px solid rgba(194, 167, 110, 0.3);
+  border-radius: 8px;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--color-charcoal);
+  background: #fafaf8;
+  transition: border-color 0.18s;
+  resize: vertical;
+}
+
+.compra-field input:focus,
+.compra-field textarea:focus {
+  outline: none;
+  border-color: var(--color-accent, #c2a76e);
+  background: #fff;
+}
+
+.compra-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  align-items: center;
+}
+
+.compra-success {
+  text-align: center;
+  padding: 48px 24px;
+}
+
+.compra-success-icon {
+  width: 64px;
+  height: 64px;
+  background: #1a7a5a;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.8rem;
+  margin: 0 auto 24px;
+}
+
+.compra-success h2 {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--color-charcoal);
+  margin: 0 0 12px;
+}
+
+.compra-success p {
+  color: var(--color-stone);
+  margin: 0 auto 28px;
+  max-width: 440px;
+}
+
+.agenda-horas-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.agenda-hora-btn {
+  padding: 10px;
+  border: 1px solid rgba(194, 167, 110, 0.35);
+  border-radius: 8px;
+  background: #fafaf8;
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  color: var(--color-charcoal);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.agenda-hora-btn:hover { border-color: var(--color-accent, #c2a76e); }
+
+.agenda-hora-btn.selected {
+  background: var(--color-accent, #c2a76e);
+  border-color: var(--color-accent, #c2a76e);
+  color: #1c1917;
+  font-weight: 700;
+}
+
+@media (max-width: 900px) {
+  .compra-layout {
+    grid-template-columns: 1fr;
+  }
+  .compra-auto-card {
+    position: static;
+  }
+}
+
+@media (max-width: 600px) {
+  .compra-form-grid {
+    grid-template-columns: 1fr;
+  }
+  .compra-form-container {
+    padding: 24px 18px;
+  }
+  .agenda-horas-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 

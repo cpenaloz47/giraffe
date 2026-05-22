@@ -1,4 +1,5 @@
 import { useMemo, useState, useCallback, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import PageHeader from '../components/ui/PageHeader';
 import { useAuth } from '../context/AuthContext';
 import { getBrands, getCars, getCarById, deleteCar, createCar } from '../services/api';
@@ -25,6 +26,7 @@ const initialFilters = {
 };
 
 export default function CatalogoPage() {
+  const navigate = useNavigate();
   const [filters, setFilters] = useState(initialFilters);
   const [autos, setAutos] = useState([]);
   const [brands, setBrands] = useState([{ value: 'todas', label: 'Todas las marcas' }]);
@@ -515,15 +517,51 @@ const autosFiltrados = useMemo(() => {
               <section className="catalogo-details-section">
                 <h4>Vistas del auto</h4>
                 <div className="catalogo-details-gallery">
-                  {((selectedAuto.imagenes || selectedAuto.galeria) || []).map((imagen, index) => (
-                    <div
-                      key={index}
-                      className="catalogo-details-gallery-image"
-                      style={{ backgroundImage: `url('${imagen.url || imagen}')` }}
-                    />
-                  ))}
+                  {(() => {
+                    const imgs = (selectedAuto.imagenes || selectedAuto.galeria || []).map((img) => img.url || img);
+                    const portada = selectedAuto.imagenPortada || selectedAuto.imagen || '';
+                    const lista = imgs.length > 0 ? imgs : (portada ? [portada] : []);
+                    return lista.map((src, index) => (
+                      <div
+                        key={index}
+                        className="catalogo-details-gallery-image"
+                        style={{ backgroundImage: `url('/autos/${src}')` }}
+                      />
+                    ));
+                  })()}
                 </div>
               </section>
+            </div>
+
+            <div className="catalogo-details-actions">
+              <button
+                type="button"
+                className="btn-detail-action btn-detail-credito"
+                onClick={() => { closeModal(); navigate('/financiamiento', { state: { auto: selectedAuto } }); }}
+              >
+                CALCULAR CRÉDITO
+              </button>
+              <button
+                type="button"
+                className="btn-detail-action btn-detail-contactar"
+                onClick={() => { closeModal(); navigate('/contacto', { state: { auto: selectedAuto } }); }}
+              >
+                CONTACTAR
+              </button>
+              <button
+                type="button"
+                className="btn-detail-action btn-detail-negociar"
+                onClick={() => { closeModal(); navigate('/compra', { state: { auto: selectedAuto } }); }}
+              >
+                NEGOCIAR
+              </button>
+              <button
+                type="button"
+                className="btn-detail-action btn-detail-agendar"
+                onClick={() => { closeModal(); navigate('/agenda', { state: { auto: selectedAuto } }); }}
+              >
+                AGENDAR
+              </button>
             </div>
           </div>
         </div>

@@ -6,6 +6,8 @@ import ServiciosPage from './pages/ServiciosPage';
 import FinanciamientoPage from './pages/FinanciamientoPage';
 import ContactoPage from './pages/ContactoPage';
 import LoginPage from './pages/LoginPage';
+import CompraPage from './pages/CompraPage';
+import AgendaPage from './pages/AgendaPage';
 
 export default function App() {
   return (
@@ -17,6 +19,8 @@ export default function App() {
         <Route path="/financiamiento" element={<FinanciamientoPage />} />
         <Route path="/contacto" element={<ContactoPage />} />
         <Route path="/ingreso" element={<LoginPage />} />
+        <Route path="/compra" element={<CompraPage />} />
+        <Route path="/agenda" element={<AgendaPage />} />
       </Route>
     </Routes>
   );
