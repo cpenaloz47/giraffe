@@ -12,7 +12,7 @@ const carsRoutes = require('./routes/cars');
 const contactRoutes = require('./routes/contact');
 
 const app = express();
-const HOST = process.env.HOST || '127.0.0.1';
+const HOST = process.env.HOST || (process.env.NODE_ENV === 'production' ? '0.0.0.0' : '127.0.0.1');
 // ============================================
 // Middlewares globales
 // ============================================
