@@ -965,6 +965,64 @@ body {
   color: var(--color-cream);
 }
 
+.btn-sold {
+  background-color: #B91C1C;
+  color: white;
+}
+
+.btn-sold:hover {
+  background-color: #9b1515;
+}
+
+.btn-add-product {
+  width: 100%;
+  margin-top: 12px;
+  border: none;
+  background-color: #2C3E50;
+  color: white;
+  padding: 10px 14px;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: 2px;
+  cursor: pointer;
+}
+
+.btn-add-product:hover {
+  background-color: #1f2b38;
+}
+
+.catalogo-card-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.catalogo-newcar-modal {
+  max-width: 900px;
+}
+
+.catalogo-newcar-form {
+  margin-top: 20px;
+}
+
+.catalogo-form-grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.catalogo-field-full {
+  grid-column: 1 / -1;
+}
+
+.catalogo-newcar-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
 .catalogo-details-modal-backdrop {
   position: fixed;
   inset: 0;

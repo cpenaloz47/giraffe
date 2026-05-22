@@ -12,7 +12,6 @@ const carsRoutes = require('./routes/cars');
 const contactRoutes = require('./routes/contact');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
 const HOST = process.env.HOST || '127.0.0.1';
 // ============================================
 // Middlewares globales
@@ -97,8 +96,8 @@ app.use((err, req, res, next) => {
 // ============================================
 // Iniciar servidor
 // ============================================
-const DEFAULT_PORT = Number(process.env.PORT) || 8080; // Cambiado a 8080 como puerto por defecto
-const availablePorts = [DEFAULT_PORT, 5000, 4000, 3000, 8000];
+const DEFAULT_PORT = Number(process.env.PORT) || 4000; // Puerto por defecto unificado a 4000
+const availablePorts = [DEFAULT_PORT, 5000, 8080, 3000, 8000];
 let currentPortIndex = 0;
 
 function startServer(port) {
@@ -124,7 +123,7 @@ function startServer(port) {
     if (err.code === 'EACCES') {
       console.error(`Error: permiso denegado para escuchar en el puerto ${port} en ${HOST}.`);
       console.error(`Solución: Ejecuta como administrador o usa un puerto específico con PORT=<puerto> npm run dev`);
-      console.error(`Ejemplo: PORT=8080 npm run dev`);
+      console.error(`Ejemplo: PORT=4000 npm run dev`);
       process.exit(1);
     }
 

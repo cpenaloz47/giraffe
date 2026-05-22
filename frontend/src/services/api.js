@@ -1,8 +1,7 @@
 // URL base del API según entorno
 const isDevelopment = import.meta.env.DEV;
-const API_BASE = isDevelopment 
-  ? 'http://127.0.0.1:4000/api/v1'  // Backend en desarrollo
-  : '/api/v1';  // Backend en producción (proxy)
+const API_BASE = import.meta.env.VITE_API_BASE_URL 
+  || (isDevelopment ? 'http://127.0.0.1:4000/api/v1' : '/api/v1');
 
 export async function apiRequest(endpoint, options = {}) {
   const token = localStorage.getItem('giraffe_token');
@@ -81,4 +80,17 @@ export async function getCars(filters = {}) {
 
 export async function getCarById(id) {
   return apiRequest(`/cars/${id}`, { method: 'GET' });
+}
+
+export async function deleteCar(id) {
+  return apiRequest(`/cars/${id}`, {
+    method: 'DELETE',
+  });
+}
+
+export async function createCar(carData) {
+  return apiRequest('/cars', {
+    method: 'POST',
+    body: JSON.stringify(carData),
+  });
 }

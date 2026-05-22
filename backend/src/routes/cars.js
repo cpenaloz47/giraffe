@@ -102,24 +102,24 @@ router.get('/:id', async (req, res) => {
 router.post('/', authenticate, authorizeAdmin, async (req, res) => {
   try {
     const {
-      marcaId, categoriaId, modelo, anio, precio,
-      motor, caballosFuerza, transmision,
-      kilometraje, descripcion, estado, destacado,
+      marca, modelo, anio, precio, tipoCarroceria,
+      transmision, combustible, kilometraje, descripcion,
+      estado, imagenUrl,
     } = req.body;
 
-    if (!marcaId || !categoriaId || !modelo || !anio || !precio) {
+    if (!marca || !modelo || !anio || !precio || !tipoCarroceria || !transmision || !combustible) {
       return res.status(400).json({
         statusCode: 400,
         error: 'Bad Request',
-        message: 'marcaId, categoriaId, modelo, anio y precio son requeridos',
+        message: 'marca, modelo, anio, precio, tipoCarroceria, transmision y combustible son requeridos',
       });
     }
 
     const result = await pool.query(
-      `INSERT INTO autos (marca_id, categoria_id, modelo, "a¤o", precio, motor, caballos_fuerza, transmision, kilometraje, descripcion, estado, destacado)
-       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
-       RETURNING *`,
-      [marcaId, categoriaId, modelo, anio, precio, motor, caballosFuerza, transmision, kilometraje || 0, descripcion, estado || 'AVAILABLE', destacado || false]
+      `INSERT INTO autos (marca, modelo, "a¤o", precio, estado, tipo_carroceria, kilometraje, transmision, combustible, descripcion, imagen_url)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+       RETURNING id, marca, modelo, "a¤o" AS anio, precio, estado, tipo_carroceria AS "tipoCarroceria", transmision, combustible, kilometraje, descripcion, imagen_url AS "imagenPortada", galeria`,
+      [marca, modelo, anio, precio, estado || 'nuevo', tipoCarroceria, kilometraje || 0, transmision, combustible, descripcion, imagenUrl || null]
     );
 
     res.status(201).json(result.rows[0]);

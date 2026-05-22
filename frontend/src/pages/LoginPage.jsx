@@ -31,7 +31,7 @@ export default function LoginPage() {
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
-    setErrors((prev) => ({ ...prev, [name]: '' }));
+    setErrors((prev) => ({ ...prev, [name]: '', submit: '' }));
   }, []);
 
   const handleRegisterChange = useCallback((e) => {
@@ -40,7 +40,7 @@ export default function LoginPage() {
       ...prev,
       [name]: type === 'checkbox' ? checked : value,
     }));
-    setErrors((prev) => ({ ...prev, [name]: '' }));
+    setErrors((prev) => ({ ...prev, [name]: '', submit: '' }));
   }, []);
 
   const validateLogin = () => {
@@ -71,11 +71,11 @@ export default function LoginPage() {
     const newErrors = validateLogin();
     if (Object.keys(newErrors).length === 0) {
       try {
-        // Simular login (en producción llamaría a login() con credenciales)
         await login(loginForm.email, loginForm.password);
         navigate('/');
       } catch (error) {
-        setErrors({ submit: 'Error al iniciar sesión' });
+        const errorMessage = error?.message || 'Error al iniciar sesión';
+        setErrors({ submit: errorMessage });
       }
     } else {
       setErrors(newErrors);
@@ -87,7 +87,6 @@ export default function LoginPage() {
     const newErrors = validateRegister();
     if (Object.keys(newErrors).length === 0) {
       try {
-        // Simular registro (en producción llamaría a register())
         await register(
           registerForm.nombre + ' ' + registerForm.apellidos,
           registerForm.email,
@@ -96,7 +95,8 @@ export default function LoginPage() {
         );
         navigate('/');
       } catch (error) {
-        setErrors({ submit: 'Error al registrarse' });
+        const errorMessage = error?.message || 'Error al registrarse';
+        setErrors({ submit: errorMessage });
       }
     } else {
       setErrors(newErrors);
@@ -164,6 +164,7 @@ export default function LoginPage() {
               </div>
 
               <button type="submit" className="btn btn-login">INGRESAR</button>
+              {errors.submit && <div className="error-text">{errors.submit}</div>}
 
               <p className="forgot-password">
                 <a href="#">¿Olvidaste tu contraseña?</a>
@@ -285,6 +286,7 @@ export default function LoginPage() {
               {errors.terms && <span className="error-text">{errors.terms}</span>}
 
               <button type="submit" className="btn btn-register">REGISTRARME</button>
+              {errors.submit && <div className="error-text">{errors.submit}</div>}
             </form>
           </div>
         </div>
