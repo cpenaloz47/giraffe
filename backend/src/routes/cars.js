@@ -28,13 +28,13 @@ router.get('/', async (req, res) => {
     if (combustible) { conditions.push(`a.combustible ILIKE $${paramIdx++}`); params.push(combustible); }
     if (minPrice) { conditions.push(`a.precio >= $${paramIdx++}`); params.push(minPrice); }
     if (maxPrice) { conditions.push(`a.precio <= $${paramIdx++}`); params.push(maxPrice); }
-    if (minYear) { conditions.push(`a."a¤o" >= $${paramIdx++}`); params.push(minYear); }
-    if (maxYear) { conditions.push(`a."a¤o" <= $${paramIdx++}`); params.push(maxYear); }
+    if (minYear) { conditions.push(`a.anio >= $${paramIdx++}`); params.push(minYear); }
+    if (maxYear) { conditions.push(`a.anio <= $${paramIdx++}`); params.push(maxYear); }
     if (estado) { conditions.push(`a.estado = $${paramIdx++}`); params.push(estado); }
 
     const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
-    const allowedSort = ['precio', 'año', 'created_at', 'modelo'];
-    const sortField = allowedSort.includes(sortBy) ? (sortBy === 'año' ? 'a."a¤o"' : `a.${sortBy}`) : 'a.created_at';
+    const allowedSort = ['precio', 'anio', 'created_at', 'modelo'];
+    const sortField = allowedSort.includes(sortBy) ? `a.${sortBy}` : 'a.created_at';
     const order = sortOrder === 'asc' ? 'ASC' : 'DESC';
 
     const countResult = await pool.query(`SELECT COUNT(*) FROM autos a ${whereClause}`, params);
@@ -42,7 +42,7 @@ router.get('/', async (req, res) => {
 
     const dataQuery = `
       SELECT
-        a.id, a.marca, a.modelo, a."a¤o" AS "anio", a.precio, a.estado, a.tipo_carroceria AS "tipoCarroceria",
+        a.id, a.marca, a.modelo, a.anio AS "anio", a.precio, a.estado, a.tipo_carroceria AS "tipoCarroceria",
         a.transmision, a.combustible, a.kilometraje, a.descripcion,
         a.imagen_url AS "imagenPortada",
         a.galeria
@@ -75,7 +75,7 @@ router.get('/:id', async (req, res) => {
   try {
     const autoResult = await pool.query(
       `SELECT
-        id, marca, modelo, "a¤o" AS "anio", precio, estado, tipo_carroceria AS "tipoCarroceria",
+        id, marca, modelo, anio AS "anio", precio, estado, tipo_carroceria AS "tipoCarroceria",
         transmision, combustible, kilometraje, descripcion, imagen_url AS "imagenPortada",
         galeria
        FROM autos
@@ -116,9 +116,9 @@ router.post('/', authenticate, authorizeAdmin, async (req, res) => {
     }
 
     const result = await pool.query(
-      `INSERT INTO autos (marca, modelo, "a¤o", precio, estado, tipo_carroceria, kilometraje, transmision, combustible, descripcion, imagen_url)
+      `INSERT INTO autos (marca, modelo, anio, precio, estado, tipo_carroceria, kilometraje, transmision, combustible, descripcion, imagen_url)
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
-       RETURNING id, marca, modelo, "a¤o" AS anio, precio, estado, tipo_carroceria AS "tipoCarroceria", transmision, combustible, kilometraje, descripcion, imagen_url AS "imagenPortada", galeria`,
+       RETURNING id, marca, modelo, anio AS anio, precio, estado, tipo_carroceria AS "tipoCarroceria", transmision, combustible, kilometraje, descripcion, imagen_url AS "imagenPortada", galeria`,
       [marca, modelo, anio, precio, estado || 'nuevo', tipoCarroceria, kilometraje || 0, transmision, combustible, descripcion, imagenUrl || null]
     );
 
@@ -138,7 +138,7 @@ router.put('/:id', authenticate, authorizeAdmin, async (req, res) => {
 
     const fieldMap = {
       marcaId: 'marca_id', categoriaId: 'categoria_id', modelo: 'modelo',
-      anio: '"a¤o"', precio: 'precio', motor: 'motor',
+      anio: 'anio', precio: 'precio', motor: 'motor',
       caballosFuerza: 'caballos_fuerza', transmision: 'transmision',
       kilometraje: 'kilometraje', descripcion: 'descripcion',
       estado: 'estado', destacado: 'destacado',

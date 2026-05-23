@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS autos (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   marca VARCHAR(100) NOT NULL,
   modelo VARCHAR(100) NOT NULL,
-  "año" INTEGER NOT NULL,
+  anio INTEGER NOT NULL,
   precio DECIMAL(12,2) NOT NULL,
   estado VARCHAR(20) DEFAULT 'nuevo' CHECK (estado IN ('nuevo', 'usado')),
   tipo_carroceria VARCHAR(50) NOT NULL,
@@ -109,7 +109,7 @@ ON CONFLICT (nombre) DO NOTHING;
 -- AUTOS
 -- ============================================
 
-INSERT INTO autos (id, marca, modelo, "año", precio, estado, tipo_carroceria, kilometraje, transmision, combustible, descripcion, imagen_url, galeria) VALUES
+INSERT INTO autos (id, marca, modelo, anio, precio, estado, tipo_carroceria, kilometraje, transmision, combustible, descripcion, imagen_url, galeria) VALUES
 (
   '27ddaac5-af55-4295-8de2-768cc0d04464',
   'Mercedes-AMG', 'SL 63 Roadster', 2024, 288900.00, 'nuevo', 'Convertible', 0,
