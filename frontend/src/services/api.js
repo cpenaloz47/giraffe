@@ -91,3 +91,17 @@ export async function createCar(carData) {
     body: JSON.stringify(carData),
   });
 }
+
+export async function createNegociacion(data) {
+  return apiRequest('/negociaciones', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function createCita(data) {
+  return apiRequest('/citas', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}

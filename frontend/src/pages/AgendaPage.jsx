@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import PageHeader from '../components/ui/PageHeader';
+import { createCita } from '../services/api';
 
 const horasDisponibles = ['09:00', '10:00', '11:00', '12:00', '14:00', '15:00', '16:00', '17:00'];
 
@@ -19,6 +20,8 @@ export default function AgendaPage() {
   const auto = state?.auto || null;
   const [form, setForm] = useState(initialForm);
   const [enviado, setEnviado] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const today = new Date().toISOString().split('T')[0];
 
@@ -27,9 +30,28 @@ export default function AgendaPage() {
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setEnviado(true);
+    setLoading(true);
+    setError(null);
+    try {
+      await createCita({
+        nombre: form.nombre,
+        email: form.email,
+        telefono: form.telefono,
+        fecha: form.fecha,
+        hora: form.hora,
+        comentario: form.comentario,
+        autoId: auto?.id || null,
+        autoMarca: auto?.marca || null,
+        autoModelo: auto?.modelo || null,
+      });
+      setEnviado(true);
+    } catch (err) {
+      setError(err.message || 'Error al agendar la visita. Intenta nuevamente.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -162,6 +184,7 @@ export default function AgendaPage() {
                   </div>
                 </div>
 
+                {error && <p className="compra-error">{error}</p>}
                 <div className="compra-form-actions">
                   <button
                     type="button"
@@ -173,9 +196,9 @@ export default function AgendaPage() {
                   <button
                     type="submit"
                     className="btn-detail-action btn-detail-agendar"
-                    disabled={!form.hora}
+                    disabled={!form.hora || loading}
                   >
-                    CONFIRMAR VISITA
+                    {loading ? 'AGENDANDO...' : 'CONFIRMAR VISITA'}
                   </button>
                 </div>
               </form>

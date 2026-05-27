@@ -61,10 +61,40 @@ CREATE TABLE IF NOT EXISTS autos (
 -- ÍNDICES
 -- ============================================
 
+CREATE TABLE IF NOT EXISTS negociaciones (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  nombre VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  telefono VARCHAR(20),
+  auto_id UUID,
+  auto_marca VARCHAR(100),
+  auto_modelo VARCHAR(100),
+  auto_precio DECIMAL(12,2),
+  oferta DECIMAL(12,2) NOT NULL,
+  mensaje TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS citas (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  nombre VARCHAR(255) NOT NULL,
+  email VARCHAR(255) NOT NULL,
+  telefono VARCHAR(20),
+  auto_id UUID,
+  auto_marca VARCHAR(100),
+  auto_modelo VARCHAR(100),
+  fecha DATE NOT NULL,
+  hora VARCHAR(5) NOT NULL,
+  comentario TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE INDEX IF NOT EXISTS idx_usuarios_email ON usuarios(email);
 CREATE INDEX IF NOT EXISTS idx_contactos_created_at ON contactos(created_at);
 CREATE INDEX IF NOT EXISTS idx_autos_marca ON autos(marca);
 CREATE INDEX IF NOT EXISTS idx_autos_precio ON autos(precio);
+CREATE INDEX IF NOT EXISTS idx_negociaciones_email ON negociaciones(email);
+CREATE INDEX IF NOT EXISTS idx_citas_fecha ON citas(fecha);
 
 -- ============================================
 -- USUARIOS

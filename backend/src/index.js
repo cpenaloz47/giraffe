@@ -10,6 +10,8 @@ const authRoutes = require('./routes/auth');
 const brandsRoutes = require('./routes/brands');
 const carsRoutes = require('./routes/cars');
 const contactRoutes = require('./routes/contact');
+const negociacionesRoutes = require('./routes/negociaciones');
+const citasRoutes = require('./routes/citas');
 
 const app = express();
 const HOST = process.env.HOST || (process.env.NODE_ENV === 'production' ? '0.0.0.0' : '127.0.0.1');
@@ -45,6 +47,8 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/brands', brandsRoutes);
 app.use('/api/v1/cars', carsRoutes);
 app.use('/api/v1/contact', contactRoutes);
+app.use('/api/v1/negociaciones', negociacionesRoutes);
+app.use('/api/v1/citas', citasRoutes);
 
 // Health check
 app.get('/api/v1/health', (req, res) => {

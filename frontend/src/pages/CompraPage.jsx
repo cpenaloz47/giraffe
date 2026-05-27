@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import PageHeader from '../components/ui/PageHeader';
+import { createNegociacion } from '../services/api';
 
 const initialForm = {
   nombre: '',
@@ -16,15 +17,36 @@ export default function CompraPage() {
   const auto = state?.auto || null;
   const [form, setForm] = useState(initialForm);
   const [enviado, setEnviado] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setEnviado(true);
+    setLoading(true);
+    setError(null);
+    try {
+      await createNegociacion({
+        nombre: form.nombre,
+        email: form.email,
+        telefono: form.telefono,
+        oferta: form.oferta,
+        mensaje: form.mensaje,
+        autoId: auto?.id || null,
+        autoMarca: auto?.marca || null,
+        autoModelo: auto?.modelo || null,
+        autoPrecio: auto?.precio || null,
+      });
+      setEnviado(true);
+    } catch (err) {
+      setError(err.message || 'Error al enviar la oferta. Intenta nuevamente.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -133,6 +155,7 @@ export default function CompraPage() {
                   </div>
                 </div>
 
+                {error && <p className="compra-error">{error}</p>}
                 <div className="compra-form-actions">
                   <button
                     type="button"
@@ -141,8 +164,8 @@ export default function CompraPage() {
                   >
                     Cancelar
                   </button>
-                  <button type="submit" className="btn-detail-action btn-detail-negociar">
-                    ENVIAR OFERTA
+                  <button type="submit" className="btn-detail-action btn-detail-negociar" disabled={loading}>
+                    {loading ? 'ENVIANDO...' : 'ENVIAR OFERTA'}
                   </button>
                 </div>
               </form>
