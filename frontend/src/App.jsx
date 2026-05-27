@@ -8,6 +8,7 @@ import ContactoPage from './pages/ContactoPage';
 import LoginPage from './pages/LoginPage';
 import CompraPage from './pages/CompraPage';
 import AgendaPage from './pages/AgendaPage';
+import ReportesPage from './pages/ReportesPage';
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
         <Route path="/ingreso" element={<LoginPage />} />
         <Route path="/compra" element={<CompraPage />} />
         <Route path="/agenda" element={<AgendaPage />} />
+        <Route path="/reportes" element={<ReportesPage />} />
       </Route>
     </Routes>
   );

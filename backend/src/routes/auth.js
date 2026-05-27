@@ -137,6 +137,20 @@ router.post('/login', [
   }
 });
 
+// GET /auth/usuarios — Solo admin
+const { authorizeAdmin } = require('../middleware/auth');
+
+router.get('/usuarios', authenticate, authorizeAdmin, async (req, res) => {
+  try {
+    const result = await pool.query(
+      'SELECT id, nombre, email, telefono, rol, activo, created_at FROM usuarios ORDER BY created_at DESC'
+    );
+    res.json({ statusCode: 200, data: result.rows });
+  } catch (err) {
+    res.status(500).json({ statusCode: 500, error: 'Internal Server Error', message: err.message });
+  }
+});
+
 // POST /auth/refresh
 router.post('/refresh', authenticate, async (req, res) => {
   try {

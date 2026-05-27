@@ -92,6 +92,22 @@ export async function createCar(carData) {
   });
 }
 
+// ============================================
+// REPORTES (admin)
+// ============================================
+
+export async function getUsuarios() {
+  return apiRequest('/auth/usuarios', { method: 'GET' });
+}
+
+export async function getNegociaciones() {
+  return apiRequest('/negociaciones', { method: 'GET' });
+}
+
+export async function getCitas() {
+  return apiRequest('/citas', { method: 'GET' });
+}
+
 export async function createNegociacion(data) {
   return apiRequest('/negociaciones', {
     method: 'POST',

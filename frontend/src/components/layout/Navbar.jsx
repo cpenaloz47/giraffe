@@ -5,7 +5,7 @@ import { navLinks } from '../../data/mock';
 
 export default function Navbar() {
   const navigate = useNavigate();
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -54,6 +54,17 @@ export default function Navbar() {
                 </NavLink>
               </li>
             ))}
+            {isAdmin && (
+              <li className="nav-item">
+                <NavLink
+                  className={({ isActive }) => `nav-link nav-link-reportes ${isActive ? 'active' : ''}`}
+                  to="/reportes"
+                  onClick={closeMenu}
+                >
+                  REPORTES
+                </NavLink>
+              </li>
+            )}
             <li className="nav-item ms-lg-3">
               {isAuthenticated ? (
                 <button className="btn btn-ingreso" onClick={logout}>

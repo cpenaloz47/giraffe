@@ -1590,3 +1590,193 @@ body {
   }
 }
 
+/* ============================================
+   NAVBAR — Link Reportes (admin)
+   ============================================ */
+.nav-link-reportes {
+  color: var(--color-accent) !important;
+  font-weight: 700;
+}
+
+.nav-link-reportes:hover,
+.nav-link-reportes.active {
+  color: var(--color-accent-muted) !important;
+}
+
+/* ============================================
+   REPORTES PAGE
+   ============================================ */
+.reportes-page {
+  min-height: 70vh;
+  padding-bottom: 60px;
+}
+
+.reporte-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 28px;
+  border-bottom: 2px solid var(--color-silk);
+  padding-bottom: 0;
+  flex-wrap: wrap;
+}
+
+.reporte-tab-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border: none;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  background: none;
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: var(--color-stone);
+  cursor: pointer;
+  transition: color 0.18s, border-color 0.18s;
+}
+
+.reporte-tab-btn:hover {
+  color: var(--color-charcoal);
+}
+
+.reporte-tab-btn.active {
+  color: var(--color-charcoal);
+  border-bottom-color: var(--color-accent);
+}
+
+.reporte-tab-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-accent);
+  color: var(--color-charcoal);
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+}
+
+.reporte-content {
+  background: #fff;
+  border: 1px solid rgba(194, 167, 110, 0.2);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.reporte-loading,
+.reporte-error {
+  padding: 40px;
+  text-align: center;
+  font-family: var(--font-body);
+  color: var(--color-stone);
+}
+
+.reporte-error { color: #c0392b; }
+
+.reporte-table-wrap {
+  overflow-x: auto;
+}
+
+.reporte-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+}
+
+.reporte-table thead {
+  background: var(--color-charcoal);
+}
+
+.reporte-table th {
+  padding: 13px 16px;
+  text-align: left;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  color: var(--color-cream);
+  white-space: nowrap;
+}
+
+.reporte-table td {
+  padding: 12px 16px;
+  color: var(--color-charcoal);
+  border-bottom: 1px solid var(--color-silk);
+  vertical-align: top;
+}
+
+.reporte-table tbody tr:hover {
+  background: var(--color-cream);
+}
+
+.reporte-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.reporte-td-wrap {
+  max-width: 220px;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.reporte-precio {
+  font-weight: 700;
+  color: var(--color-accent-muted);
+}
+
+.reporte-empty-row {
+  text-align: center;
+  color: var(--color-stone);
+  padding: 40px !important;
+  font-style: italic;
+}
+
+.reporte-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  font-family: var(--font-display);
+  letter-spacing: 0.5px;
+}
+
+.reporte-badge--admin {
+  background: rgba(194, 167, 110, 0.15);
+  color: var(--color-accent-muted);
+  border: 1px solid rgba(194, 167, 110, 0.4);
+}
+
+.reporte-badge--user {
+  background: var(--color-silk);
+  color: var(--color-warmgray);
+  border: 1px solid var(--color-pearl);
+}
+
+.reporte-motivo {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--color-silk);
+  color: var(--color-warmgray);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+@media (max-width: 768px) {
+  .reporte-tabs {
+    gap: 4px;
+  }
+  .reporte-tab-btn {
+    padding: 8px 14px;
+    font-size: 0.75rem;
+  }
+}
+
